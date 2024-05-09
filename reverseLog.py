@@ -34,17 +34,63 @@ class reverseLog(logFile):
                 print('Call {} in database as log id {}.'.format(\
                         self.header.CALLSIGN, logid))
                 return None
+            self.header.START_OF_LOG ='3.0'
             self.header.CONTEST = 'MO-QSO-PARTY'
             self.header.CREATED_BY = 'N0SO Reverse Log Tool V{}'.format(VERSION)
             self.header.CATEGORY_OPERATOR = 'CHECKLOG'
+            self.header.CATEGORY_MODE  = 'MIXED'
+            self.header.CATEGORY_POWER = 'LOW'
+            self.header.CATEGORY_STATION = 'FIXED'
             self.header.LOCATION = args.location.upper()
             self.getOpData(self.header.CALLSIGN)
             self.getQSOs(self.header.CALLSIGN, db)
             self.displayLog()
                 
     def displayLog(self):
-        for l in self.PrettyPrint():
-            print(l)        
+        for l in self.showCab():
+            print(l)
+            
+    def showCab(self):
+        cabData = list()
+        cabData.append('START-OF-LOG: {}'.format(self.header.START_OF_LOG))
+        cabData.append('CALLSIGN: {}'.format(self.header.CALLSIGN))
+        cabData.append('CONTEST: {}'.format(self.header.CONTEST))
+        cabData.append('LOCATION: {}'.format(self.header.LOCATION))
+        cabData.append('CATEGORY-BAND: {}'.format(self.header.CATEGORY_BAND))
+        cabData.append('CATEGORY-MODE: {}'.format(self.header.CATEGORY_MODE))
+        cabData.append('CATEGORY-OPERATOR: {}'.format(self.header.CATEGORY_OPERATOR))
+        cabData.append('CATEGORY-POWER: {}'.format(self.header.CATEGORY_POWER))
+        cabData.append('CATEGORY-STATION: {}'.format(self.header.CATEGORY_STATION))
+        cabData.append('CATEGORY-TIME: {}'.format(  self.header.CATEGORY_TIME))
+        cabData.append('CATEGORY-TRANSMITTER: {}'.format( self.header.CATEGORY_TRANSMITTER))
+        cabData.append('CATEGORY-OVERLAY: {}'.format(self.header.CATEGORY_OVERLAY))
+        cabData.append('CERTIFICATE: {}'.format(  self.header.CERTIFICATE))
+        cabData.append('CLAIMED-SCORE: {}'.format(  self.header.CLAIMED_SCORE))
+        cabData.append('CLUB: {}'.format(  self.header.CLUB))
+        cabData.append('CREATED-BY: {}'.format(  self.header.CREATED_BY))
+        cabData.append('EMAIL: {}'.format(  self.header.EMAIL))
+        cabData.append('GRID-LOCATOR: {}'.format(  self.header.GRID_LOCATOR))
+        cabData.append('NAME: {}'.format(  self.header.NAME))
+        cabData.append('ADDRESS: {}'.format(  self.header.ADDRESS))
+        cabData.append('ADDRESS-CITY: {}'.format(  self.header.ADDRESS_CITY))
+        cabData.append('ADDRESS-STATE-PROVINCE: {}'.format(  self.header.ADDRESS_STATE_PROVINCE))
+        cabData.append('ADDRESS-POSTALCODE: {}'.format(  self.header.ADDRESS_POSTALCODE))
+        cabData.append('ADDRESS-COUNTRY: {}'.format(  self.header.ADDRESS_COUNTRY))
+        cabData.append('OPERATORS: {}'.format(  self.header.OPERATORS))
+        cabData.append('SOAPBOX: {}'.format(  self.header.SOAPBOX))
+        for q in self.qsoList:
+            cabData.append('QSO: {} {} {} {} {} {} {} {} {}'.format(\
+                                q.freq,
+                                q.mode,
+                                q.qtime.strftime('%Y-%m-%d %H%M'),
+                                q.mycall,
+                                q.myrst,
+                                q.myqth,
+                                q.urcall,
+                                q.urrst,
+                                q.urqth))
+        cabData.append('END-OF-LOG:')
+        return cabData
  
     def getQSOs(self, callsign, db):
         cu = CabrilloUtils()
